@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import * as path from 'path';
 
 import { ApiModule } from './api/api.module';
 import { AppController } from './app.controller';
@@ -15,7 +16,10 @@ const nodeEnv = process.env.NODE_ENV;
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${nodeEnv ?? ''}`,
+      envFilePath: path.resolve(
+        'environments',
+        `.env.${nodeEnv ?? 'development'}`,
+      ),
       load: [appConfig, dbConfig],
     }),
     ApiModule,
