@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import appConfig from './config/app.config';
 import dbConfig from './config/db.config';
 import { DatabaseModule } from './database/database.module';
+import { SharedModule } from './shared/shared.module';
 
 const nodeEnv = process.env.NODE_ENV;
 
@@ -25,6 +26,7 @@ const nodeEnv = process.env.NODE_ENV;
     DatabaseModule,
     AuthModule,
     ApiModule,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [AppService],
