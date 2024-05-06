@@ -46,7 +46,7 @@ export class CreateTasksTable1714868327873 implements MigrationInterface {
             onUpdate: 'CURRENT_TIMESTAMP',
           },
           {
-            name: 'owner',
+            name: 'ownerId',
             type: 'bigint',
             isNullable: false,
           },
@@ -60,10 +60,11 @@ export class CreateTasksTable1714868327873 implements MigrationInterface {
     await queryRunner.createForeignKey(
       'Tasks',
       new TableForeignKey({
-        columnNames: ['owner'],
+        columnNames: ['ownerId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'Users',
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       }),
     );
   }
