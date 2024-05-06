@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Logger,
   Param,
   Patch,
@@ -13,10 +15,14 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
 
+import { User } from 'src/database/entities/user.entity';
+import { APIDataResponse } from 'src/shared/responses/api-data-response';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
@@ -36,39 +42,52 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @Res() response: Response,
   ) {
-    let responseData: unknown;
     try {
       await this.usersService.create(createUserDto);
-      response.status(201);
+      response.status(HttpStatus.CREATED);
+      response.send();
     } catch (err: any) {
+      let errorData = {
+        message: err?.message,
+        code: HttpStatus.INTERNAL_SERVER_ERROR,
+      };
       if (err.detail?.includes('already exists')) {
-        response.status(400);
-        responseData = {
+        errorData = {
           message: `User with username '${createUserDto.username}' already exists.`,
+          code: HttpStatus.BAD_REQUEST,
         };
-      } else {
-        responseData = { message: err?.message };
       }
+      throw new HttpException(errorData.message, errorData.code);
     }
-    return response.send(responseData);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @ApiOkResponse()
+  @ApiBadRequestResponse()
+  async findAll(@Res() response: Response) {
+    const list = await this.usersService.findAll();
+    const apiResponse = new APIDataResponse<User[]>(list);
+    response.status(HttpStatus.OK).send(apiResponse);
   }
 
   @Get(':id')
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
   @Patch(':id')
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
+  @ApiOkResponse()
+  @ApiNotFoundResponse()
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
