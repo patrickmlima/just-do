@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Task } from './task.entity';
 
-@Entity()
+@Entity({ name: 'Users' })
 export class User {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
@@ -17,7 +17,7 @@ export class User {
   username: string;
 
   @Column()
-  private password: string;
+  password: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

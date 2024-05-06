@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
-@Entity()
+@Entity({ name: 'Tasks' })
 export class Task {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
