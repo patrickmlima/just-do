@@ -7,7 +7,7 @@ import {
 
 export class CreateTasksTable1714868327873 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.createTable(
+    await queryRunner.createTable(
       new Table({
         name: 'Tasks',
         columns: [
@@ -36,14 +36,14 @@ export class CreateTasksTable1714868327873 implements MigrationInterface {
             name: 'createdAt',
             type: 'timestamp',
             isNullable: false,
-            default: 'CURRENT_TIMESTAMP()',
+            default: 'CURRENT_TIMESTAMP',
           },
           {
             name: 'updatedAt',
             type: 'timestamp',
             isNullable: false,
-            default: 'CURRENT_TIMESTAMP()',
-            onUpdate: 'CURRENT_TIMESTAMP()',
+            default: 'CURRENT_TIMESTAMP',
+            onUpdate: 'CURRENT_TIMESTAMP',
           },
           {
             name: 'owner',
@@ -53,9 +53,11 @@ export class CreateTasksTable1714868327873 implements MigrationInterface {
         ],
       }),
       true,
+      true,
+      true,
     );
 
-    queryRunner.createForeignKey(
+    await queryRunner.createForeignKey(
       'Tasks',
       new TableForeignKey({
         columnNames: ['owner'],
@@ -67,6 +69,6 @@ export class CreateTasksTable1714868327873 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.dropTable('Tasks', true, true);
+    queryRunner.dropTable('Tasks', true, true, true);
   }
 }
