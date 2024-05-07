@@ -5,7 +5,6 @@ import {
   Get,
   HttpException,
   HttpStatus,
-  Logger,
   Param,
   Patch,
   Post,
@@ -20,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
+import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 
 import { User } from 'src/database/entities/user.entity';
 import { APIDataResponse } from 'src/shared/responses/api-data-response';
@@ -31,8 +31,6 @@ import { UsersService } from './users.service';
 @ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  private logger = new Logger(UsersController.name);
 
   @Post()
   @ApiCreatedResponse()
@@ -73,22 +71,65 @@ export class UsersController {
   @Get(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse()
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const user = await this.usersService.findOne(+id);
+      return user;
+    } catch (err) {
+      let message = err?.message ?? err?.detail;
+      let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+
+      if (err instanceof EntityNotFoundError) {
+        message = `User ${id} not found`;
+        statusCode = HttpStatus.NOT_FOUND;
+      }
+      throw new HttpException(message, statusCode);
+    }
   }
 
   @Patch(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @ApiBadRequestResponse()
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    try {
+      const user = await this.usersService.update(+id, updateUserDto);
+      return user;
+    } catch (err) {
+      let message = err?.message ?? err?.detail;
+      let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+
+      if (err instanceof EntityNotFoundError) {
+        message = `User ${id} not found`;
+        statusCode = HttpStatus.NOT_FOUND;
+      }
+
+      if (err instanceof QueryFailedError) {
+        message = `Could not update user ${id}: ${err.message}`;
+        statusCode = HttpStatus.BAD_REQUEST;
+      }
+
+      throw new HttpException(message, statusCode);
+    }
   }
 
   @Delete(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse()
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    try {
+      await this.usersService.remove(+id);
+    } catch (err) {
+      const excData = {
+        message: err?.message,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      };
+
+      if (err instanceof EntityNotFoundError) {
+        excData.message = `User ${id} not found`;
+        excData.statusCode = HttpStatus.NOT_FOUND;
+      }
+      throw new HttpException(excData.message, excData.statusCode);
+    }
   }
 }

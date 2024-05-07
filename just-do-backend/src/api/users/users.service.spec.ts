@@ -40,7 +40,7 @@ describe('UsersService', () => {
     });
   };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [],
       providers: [
@@ -57,7 +57,7 @@ describe('UsersService', () => {
     repository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
-  afterEach(() => {
+  afterAll(() => {
     jest.clearAllMocks();
   });
 
