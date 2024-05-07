@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { PasswordService } from './password/password.service';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
@@ -6,7 +8,8 @@ describe('UsersService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService],
+      imports: [],
+      providers: [UsersService, PasswordService],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
@@ -14,5 +17,10 @@ describe('UsersService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should be able to list users', async () => {
+    const users = await service.findAll();
+    expect(users).toHaveLength(0);
   });
 });

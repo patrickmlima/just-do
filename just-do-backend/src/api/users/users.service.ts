@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
-
-import { APP_CONSTANTS } from 'src/constants';
-import { User } from 'src/database/entities/user.entity';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+import { User } from 'src/database/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PasswordService } from './password/password.service';
@@ -10,7 +10,7 @@ import { PasswordService } from './password/password.service';
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(APP_CONSTANTS.providers.UserRepository)
+    @InjectRepository(User)
     private userRepository: Repository<User>,
     private passwordService: PasswordService,
   ) {}

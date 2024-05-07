@@ -1,19 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
-import { APP_CONSTANTS } from 'src/constants';
-import { Task } from 'src/database/entities/task.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Task } from '../../database/entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @Inject(APP_CONSTANTS.providers.TaskRepository)
+    @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
   ) {}
 
-  create(createTaskDto: CreateTaskDto) {
+  async create(createTaskDto: CreateTaskDto) {
     const taskData = {
       ...createTaskDto,
       owner: {
@@ -24,19 +24,19 @@ export class TasksService {
     return this.taskRepository.save(task);
   }
 
-  findAll() {
+  async findAll() {
     return this.taskRepository.findAndCount();
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return this.taskRepository.findOneByOrFail({ id });
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
+  async update(id: number, updateTaskDto: UpdateTaskDto) {
     return this.taskRepository.update({ id }, updateTaskDto);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return this.taskRepository.delete({ id });
   }
 }

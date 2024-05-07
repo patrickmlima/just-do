@@ -3,9 +3,12 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
+  Res,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -19,6 +22,9 @@ import {
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
+import { APIDataResponse } from 'src/shared/responses/api-data-response';
+import { Task } from 'src/database/entities/task.entity';
+import { Response } from 'express';
 
 @Controller('tasks')
 @ApiTags('Tasks')
@@ -29,16 +35,32 @@ export class TasksController {
   @ApiCreatedResponse()
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.tasksService.create(createTaskDto);
+  async create(
+    @Body() createTaskDto: CreateTaskDto,
+    @Res() response: Response,
+  ) {
+    try {
+      const task = await this.tasksService.create(createTaskDto);
+      response.status(HttpStatus.CREATED).send(new APIDataResponse<Task>(task));
+    } catch (err) {
+      throw new HttpException(
+        err?.message ?? err?.detail,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @Get()
   @ApiOkResponse()
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
-  findAll() {
-    return this.tasksService.findAll();
+  async findAll() {
+    try {
+      const [list] = await this.tasksService.findAll();
+      return new APIDataResponse<Task[]>(list);
+    } catch (err: any) {
+      throw new HttpException(err?.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get(':id')

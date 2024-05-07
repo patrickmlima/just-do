@@ -1,12 +1,16 @@
-import { IsAlphanumeric, IsBoolean } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, IsString } from 'class-validator';
 
 export class UpdateTaskDto {
-  @IsAlphanumeric()
+  @IsString()
+  @ApiProperty({ maxLength: 150 })
   title: string;
 
-  @IsAlphanumeric()
+  @IsString()
+  @ApiProperty({ maxLength: 1024 })
   description: string;
 
   @IsBoolean()
+  @ApiProperty()
   isCompleted: boolean;
 }
