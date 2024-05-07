@@ -25,6 +25,7 @@ import { TasksService } from './tasks.service';
 import { APIDataResponse } from 'src/shared/responses/api-data-response';
 import { Task } from 'src/database/entities/task.entity';
 import { Response } from 'express';
+import { EntityNotFoundError } from 'typeorm';
 
 @Controller('tasks')
 @ApiTags('Tasks')
@@ -68,8 +69,19 @@ export class TasksController {
   @ApiBadRequestResponse()
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
-  findOne(@Param('id') id: string) {
-    return this.tasksService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const task = await this.tasksService.findOne(+id);
+      return task;
+    } catch (err) {
+      let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+
+      if (err instanceof EntityNotFoundError) {
+        statusCode = HttpStatus.NOT_FOUND;
+      }
+
+      throw new HttpException(err?.message, statusCode);
+    }
   }
 
   @Patch(':id')
@@ -77,8 +89,19 @@ export class TasksController {
   @ApiBadRequestResponse()
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.tasksService.update(+id, updateTaskDto);
+  async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+    try {
+      const updatedTask = await this.tasksService.update(+id, updateTaskDto);
+      return updatedTask;
+    } catch (err) {
+      let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+
+      if (err instanceof EntityNotFoundError) {
+        statusCode = HttpStatus.NOT_FOUND;
+      }
+
+      throw new HttpException(err?.message, statusCode);
+    }
   }
 
   @Delete(':id')
@@ -86,7 +109,17 @@ export class TasksController {
   @ApiBadRequestResponse()
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id);
+  async remove(@Param('id') id: string) {
+    try {
+      await this.tasksService.remove(+id);
+    } catch (err) {
+      let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+
+      if (err instanceof EntityNotFoundError) {
+        statusCode = HttpStatus.NOT_FOUND;
+      }
+
+      throw new HttpException(err?.message, statusCode);
+    }
   }
 }
