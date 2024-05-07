@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { EntityNotFoundError, FindOptionsWhere, Repository } from 'typeorm';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from '../../database/entities/task.entity';
@@ -33,10 +33,19 @@ export class TasksService {
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
-    return this.taskRepository.update({ id }, updateTaskDto);
+    const options = { id };
+    const result = await this.taskRepository.update(options, updateTaskDto);
+    if (result.affected === 0) {
+      throw new EntityNotFoundError(Task, options);
+    }
+    return this.taskRepository.findOneBy(options);
   }
 
   async remove(id: number) {
-    return this.taskRepository.delete({ id });
+    const options: FindOptionsWhere<Task> = { id };
+    const result = await this.taskRepository.delete(options);
+    if (result.affected === 0) {
+      throw new EntityNotFoundError(Task, options);
+    }
   }
 }
