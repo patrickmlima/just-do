@@ -9,8 +9,8 @@ import {
 
 import { mockedTasksList } from '../../../test/mocks/tasks.mock';
 import { Task } from '../../database/entities/task.entity';
-import { TasksService } from './tasks.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TasksService } from './tasks.service';
 
 const findOneOrFailImplementation = async (
   where: FindOptionsWhere<Task> | FindOptionsWhere<Task>[],
