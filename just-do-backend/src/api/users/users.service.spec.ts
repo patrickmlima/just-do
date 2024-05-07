@@ -1,13 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  EntityNotFoundError,
-  FindOptionsWhere,
-  Repository,
-  UpdateResult,
-} from 'typeorm';
+import { EntityNotFoundError, Repository } from 'typeorm';
 
 import { User } from 'src/database/entities/user.entity';
+import { MockDbImplementation } from '../../../test/mocks/db-operations';
 import { mockedUsersList } from '../../../test/mocks/users.mock';
 import { PasswordService } from './password/password.service';
 import { UsersService } from './users.service';
@@ -15,30 +11,7 @@ import { UsersService } from './users.service';
 describe('UsersService', () => {
   let service: UsersService;
   let repository: Repository<User>;
-
-  const findOneOrFailImplementation = async (
-    where: FindOptionsWhere<User> | FindOptionsWhere<User>[],
-  ) => {
-    const { id } = (where ?? {}) as FindOptionsWhere<User>;
-    const foundUser = mockedUsersList.find((user) => user.id === id);
-    return new Promise<User>((resolve, reject) =>
-      foundUser
-        ? resolve(foundUser)
-        : reject(new EntityNotFoundError(User, where)),
-    );
-  };
-
-  const updateOneImplementation = (criteria: any) => {
-    const { id } = criteria;
-    const foundUser = mockedUsersList.find((user) => user.id === id);
-    return new Promise<UpdateResult>((resolve) => {
-      return resolve({
-        affected: foundUser ? 1 : 0,
-        raw: '',
-        generatedMaps: [],
-      });
-    });
-  };
+  let mockedDbOperations: MockDbImplementation<User>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,6 +30,10 @@ describe('UsersService', () => {
     repository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
+  beforeEach(async () => {
+    mockedDbOperations = new MockDbImplementation<User>(mockedUsersList, User);
+  });
+
   afterAll(() => {
     jest.clearAllMocks();
   });
@@ -66,10 +43,10 @@ describe('UsersService', () => {
   });
 
   it('should be able to list users', async () => {
-    mockedUsersList;
     const findAllSpy = jest
       .spyOn(repository, 'findBy')
-      .mockResolvedValue(mockedUsersList);
+      .mockImplementation(() => mockedDbOperations.findAll());
+
     const users = await service.findAll();
 
     expect(findAllSpy).toHaveBeenCalled();
@@ -77,27 +54,36 @@ describe('UsersService', () => {
   });
 
   it('should be able to get a single user', async () => {
-    const [expectedUser] = mockedUsersList;
+    const [theUser] = mockedUsersList;
+    const expectedUser = {
+      ...theUser,
+    };
+    delete expectedUser.password;
+
     const findOneSpy = jest
       .spyOn(repository, 'findOneByOrFail')
-      .mockImplementation(findOneOrFailImplementation);
+      .mockImplementation((...args) =>
+        mockedDbOperations.findOneOrFail(...args),
+      );
 
     const actualUser = await service.findOne(expectedUser.id);
 
     expect(findOneSpy).toHaveBeenCalled();
-    expect(actualUser).toBe(expectedUser);
+    expect(actualUser).toStrictEqual(expectedUser);
   });
 
   it('should throw exception when user is not found', async () => {
     const findOneSpy = jest
       .spyOn(repository, 'findOneByOrFail')
-      .mockImplementation(findOneOrFailImplementation);
+      .mockImplementation((...args) =>
+        mockedDbOperations.findOneOrFail(...args),
+      );
 
     try {
       await service.findOne(111);
       expect(findOneSpy).toThrow(EntityNotFoundError);
     } catch (err) {
-      // just to show error on console
+      // just to hide error on console
     }
 
     expect(findOneSpy).toHaveBeenCalled();
@@ -111,16 +97,13 @@ describe('UsersService', () => {
 
     const updateSpy = jest
       .spyOn(repository, 'update')
-      .mockImplementation(updateOneImplementation);
+      .mockImplementation((...args) => mockedDbOperations.updateOne(...args));
 
     const findAfterUpdateSpy = jest
       .spyOn(repository, 'findOneBy')
-      .mockImplementation((criteria: any) => {
-        const user = mockedUsersList.find((user) => user.id === criteria.id);
-        const selectUser = { ...user, ...patchData };
-        delete selectUser.password;
-        return Promise.resolve(selectUser);
-      });
+      .mockImplementation((...args) =>
+        mockedDbOperations.findOneOrFail(...args),
+      );
 
     const actualUser = await service.update(theUser.id, patchData);
 
@@ -134,7 +117,7 @@ describe('UsersService', () => {
 
     const updateSpy = jest
       .spyOn(repository, 'update')
-      .mockImplementation(updateOneImplementation);
+      .mockImplementation((...args) => mockedDbOperations.updateOne(...args));
 
     try {
       await service.update(123, patchData);
@@ -146,13 +129,9 @@ describe('UsersService', () => {
   });
 
   it('should be able to delete a user', async () => {
-    const deleteSpy = jest.spyOn(repository, 'delete').mockImplementation(() =>
-      Promise.resolve({
-        affected: 1,
-        generatedMaps: [],
-        raw: '',
-      } as UpdateResult),
-    );
+    const deleteSpy = jest
+      .spyOn(repository, 'delete')
+      .mockImplementation((...args) => mockedDbOperations.delete(...args));
 
     try {
       await service.remove(1);
@@ -164,13 +143,9 @@ describe('UsersService', () => {
   });
 
   it('should throw exception when deleting inexistent user', async () => {
-    const deleteSpy = jest.spyOn(repository, 'delete').mockImplementation(() =>
-      Promise.resolve({
-        affected: 0,
-        generatedMaps: [],
-        raw: '',
-      } as UpdateResult),
-    );
+    const deleteSpy = jest
+      .spyOn(repository, 'delete')
+      .mockImplementation((...args) => mockedDbOperations.delete(...args));
 
     try {
       await service.remove(111);
