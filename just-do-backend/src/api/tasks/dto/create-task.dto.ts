@@ -8,11 +8,11 @@ export class CreateTaskDto {
   title: string;
 
   @IsString()
-  @ApiProperty({ maxLength: 1024 })
+  @ApiProperty({ required: false, maxLength: 1024 })
   description: string;
 
   @IsNumber()
   @IsNotEmpty()
-  @ApiProperty({ minimum: 1 })
+  @ApiProperty({ required: true, minimum: 1 })
   owner: number;
 }

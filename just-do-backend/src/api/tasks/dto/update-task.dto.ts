@@ -3,14 +3,14 @@ import { IsBoolean, IsString } from 'class-validator';
 
 export class UpdateTaskDto {
   @IsString()
-  @ApiProperty({ maxLength: 150 })
+  @ApiProperty({ required: false, maxLength: 150 })
   title?: string;
 
   @IsString()
-  @ApiProperty({ maxLength: 1024 })
+  @ApiProperty({ required: false, maxLength: 1024 })
   description?: string;
 
   @IsBoolean()
-  @ApiProperty()
+  @ApiProperty({ required: false })
   isCompleted?: boolean;
 }
