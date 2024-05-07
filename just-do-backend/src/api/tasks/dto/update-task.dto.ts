@@ -1,13 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsString, MaxLength } from 'class-validator';
+
+import { APP_CONSTANTS } from 'src/shared/constants';
+
+const { inputsLengthRange } = APP_CONSTANTS;
 
 export class UpdateTaskDto {
   @IsString()
-  @ApiProperty({ required: false, maxLength: 150 })
+  @MaxLength(inputsLengthRange.taskTitle.max)
+  @ApiProperty({ required: false, maxLength: inputsLengthRange.taskTitle.max })
   title?: string;
 
   @IsString()
-  @ApiProperty({ required: false, maxLength: 1024 })
+  @MaxLength(inputsLengthRange.taskDescription.max)
+  @ApiProperty({
+    required: false,
+    maxLength: inputsLengthRange.taskDescription.max,
+  })
   description?: string;
 
   @IsBoolean()

@@ -1,14 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+
+import { APP_CONSTANTS } from 'src/shared/constants';
+
+const { inputsLengthRange } = APP_CONSTANTS;
 
 export class CreateTaskDto {
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ required: true, maxLength: 150 })
+  @MinLength(inputsLengthRange.taskTitle.min)
+  @MaxLength(inputsLengthRange.taskTitle.max)
+  @ApiProperty({
+    required: true,
+    minLength: inputsLengthRange.taskTitle.min,
+    maxLength: inputsLengthRange.taskTitle.max,
+  })
   title: string;
 
   @IsString()
-  @ApiProperty({ required: false, maxLength: 1024 })
+  @MaxLength(inputsLengthRange.taskDescription.max)
+  @ApiProperty({
+    required: false,
+    maxLength: inputsLengthRange.taskDescription.max,
+  })
   description: string;
 
   @IsNumber()
