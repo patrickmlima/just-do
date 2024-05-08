@@ -17,7 +17,7 @@ export class AuthService {
     try {
       const user = await this.userService.findByUsername(username);
 
-      const isPasswordCorrect = this.passwordService.doesPassowrdMatch(
+      const isPasswordCorrect = await this.passwordService.doesPassowrdMatch(
         password,
         user.password,
       );
