@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -17,6 +18,8 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
@@ -26,9 +29,13 @@ import { APIDataResponse } from 'src/shared/responses/api-data-response';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { LocalAuthGuard } from 'src/auth/guards/localAuth.guard';
 
 @Controller('users')
 @ApiTags('Users')
+@ApiUnauthorizedResponse()
+@ApiBearerAuth('bearerAuth')
+@UseGuards(LocalAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

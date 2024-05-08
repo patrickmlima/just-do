@@ -9,14 +9,17 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -26,9 +29,13 @@ import { APIDataResponse } from 'src/shared/responses/api-data-response';
 import { Task } from 'src/database/entities/task.entity';
 import { Response } from 'express';
 import { EntityNotFoundError } from 'typeorm';
+import { LocalAuthGuard } from 'src/auth/guards/localAuth.guard';
 
 @Controller('tasks')
 @ApiTags('Tasks')
+@ApiUnauthorizedResponse()
+@ApiBearerAuth('bearerAuth')
+@UseGuards(LocalAuthGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 

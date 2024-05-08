@@ -14,8 +14,9 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, password: string) {
-    const user = await this.userService.findByUsername(username);
-    if (user) {
+    try {
+      const user = await this.userService.findByUsername(username);
+
       const isPasswordCorrect = this.passwordService.doesPassowrdMatch(
         password,
         user.password,
@@ -23,6 +24,8 @@ export class AuthService {
       if (isPasswordCorrect) {
         return user;
       }
+    } catch (err) {
+      // do nothing
     }
 
     return null;

@@ -11,6 +11,12 @@ const bootstrapSwagger = (app: INestApplication) => {
     .setTitle('Just Do API')
     .setDescription('The straight and simple To Do app')
     .setVersion('1.0')
+    .addSecurity('bearerAuth', {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      in: 'header',
+    })
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
