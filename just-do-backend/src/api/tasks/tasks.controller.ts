@@ -9,7 +9,6 @@ import {
   Patch,
   Post,
   Res,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -21,21 +20,19 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Response } from 'express';
+import { EntityNotFoundError } from 'typeorm';
 
+import { Task } from 'src/database/entities/task.entity';
+import { APIDataResponse } from 'src/shared/responses/api-data-response';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
-import { APIDataResponse } from 'src/shared/responses/api-data-response';
-import { Task } from 'src/database/entities/task.entity';
-import { Response } from 'express';
-import { EntityNotFoundError } from 'typeorm';
-import { LocalAuthGuard } from 'src/auth/guards/localAuth.guard';
 
 @Controller('tasks')
 @ApiTags('Tasks')
 @ApiUnauthorizedResponse()
 @ApiBearerAuth('bearerAuth')
-@UseGuards(LocalAuthGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 

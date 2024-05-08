@@ -21,6 +21,7 @@ export class AuthService {
         password,
         user.password,
       );
+
       if (isPasswordCorrect) {
         return user;
       }
