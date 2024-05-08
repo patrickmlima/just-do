@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityNotFoundError, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  EntityNotFoundError,
+  FindOneOptions,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 
 import { User } from 'src/database/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -29,6 +34,11 @@ export class UsersService {
   async findOne(id: number) {
     const options: FindOptionsWhere<User> = { id };
     return this.userRepository.findOneByOrFail(options);
+  }
+
+  async findByUsername(username: string) {
+    const options: FindOneOptions<User> = { where: { username } };
+    return this.userRepository.findOneOrFail(options);
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
