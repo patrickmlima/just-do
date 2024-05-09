@@ -29,6 +29,7 @@ async function bootstrap() {
   bootstrapSwagger(app);
 
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
 
   const configService = app.get(ConfigService);
   const appConfig = configService.get<AppConfig>('application');
