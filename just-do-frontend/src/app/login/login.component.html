@@ -1,0 +1,44 @@
+<button class="btn btn-lg btn-primary" (click)="openLoginModal(content)">
+  Login
+</button>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Insert your credentials</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="username">Username</label>
+        <input
+          id="user-name"
+          name="username"
+          class="form-control"
+          type="text"
+          [(ngModel)]="userLogin.username"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="user-password">Password</label>
+        <input
+          id="user-pwd"
+          name="user-password"
+          class="form-control"
+          type="password"
+          [(ngModel)]="userLogin.password"
+        />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-dark" (click)="modal.close()">
+      Login
+    </button>
+  </div>
+</ng-template>

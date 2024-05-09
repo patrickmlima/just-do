@@ -1,0 +1,18 @@
+@import './app/shared/styles/colors.scss';
+
+html,
+body {
+  height: 100%;
+  background-color: $white;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+$ok: #6efa7d;
+$alert: #fad36e;
+$principal: #6d91fa;
+$secondary: #8088a5;
+$pink: #fa6a92;
+$white: #f1f1f1;
