@@ -41,4 +41,8 @@ export class AuthService {
   isAuthenticated() {
     return !!this.getAccessToken();
   }
+
+  deleteSession() {
+    localStorage.clear();
+  }
 }

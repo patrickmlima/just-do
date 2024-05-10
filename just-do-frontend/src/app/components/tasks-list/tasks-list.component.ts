@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   EventEmitter,
@@ -5,14 +6,14 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { Task } from '../../shared/types/task.type';
-import { UserTaskService } from '../../shared/user-task.service';
-import { CommonModule } from '@angular/common';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+
 import { SharedModule } from '../../shared/shared.module';
 import { DataResponse } from '../../shared/types/api.type';
-import { NewTaskComponent } from '../new-task/new-task.component';
+import { Task } from '../../shared/types/task.type';
+import { UserTaskService } from '../../shared/user-task.service';
 import { DeleteTaskComponent } from '../delete-task/delete-task.component';
-import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { NewTaskComponent } from '../new-task/new-task.component';
 import { TaskCompleteComponent } from '../task-complete/task-complete.component';
 
 @Component({
