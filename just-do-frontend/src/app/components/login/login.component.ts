@@ -1,7 +1,7 @@
 import { Component, inject, signal, TemplateRef } from '@angular/core';
 import { UserLogin } from '../../shared/types/user.type';
 import { FormsModule } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../auth/auth.service';
 import { LoginResponse } from '../../shared/types/auth.type';
 import { Router } from '@angular/router';
@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent {
   private modalService = inject(NgbModal);
+  private modalRef: NgbModalRef | undefined;
   userLogin: UserLogin = { username: '', password: '' };
   isLoading = signal(false);
 
@@ -24,11 +25,9 @@ export class LoginComponent {
   ) {}
 
   openLoginModal(content: TemplateRef<any>) {
-    this.modalService
-      .open(content, { ariaLabelledBy: 'modal-basic-title' })
-      .result.then((result) => {
-        this.userLogin = { username: '', password: '' };
-      });
+    this.modalRef = this.modalService.open(content, {
+      ariaLabelledBy: 'modal-basic-title',
+    });
   }
 
   submitData() {
@@ -38,17 +37,22 @@ export class LoginComponent {
       const response = value as LoginResponse;
       if (response.access_token) {
         this.authService.setSession(response.access_token);
-        this.modalService.dismissAll();
+        this.modalRef?.close();
         this.router.navigate(['home']);
       }
     };
 
-    const finallyCb = () => this.isLoading.set(false);
+    const finallyCb = () => {
+      this.isLoading.set(false);
+      this.userLogin = { username: '', password: '' };
+    };
 
     this.authService.doLogin(this.userLogin).subscribe({
       next: successCb,
-      error(err) {
-        console.error(err);
+      error: (err) => {
+        if (err) {
+          console.error(err);
+        }
       },
       complete: finallyCb,
     });
