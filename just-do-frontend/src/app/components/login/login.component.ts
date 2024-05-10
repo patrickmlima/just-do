@@ -1,15 +1,16 @@
 import { Component, inject, signal, TemplateRef } from '@angular/core';
 import { UserLogin } from '../../shared/types/user.type';
 import { FormsModule } from '@angular/forms';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlert, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '../../auth/auth.service';
 import { LoginResponse } from '../../shared/types/auth.type';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NgbAlert],
   templateUrl: './login.component.html',
   styleUrl: './login.component.sass',
 })
@@ -18,6 +19,7 @@ export class LoginComponent {
   private modalRef: NgbModalRef | undefined;
   userLogin: UserLogin = { username: '', password: '' };
   isLoading = signal(false);
+  errorMessage = signal('');
 
   constructor(
     private readonly authService: AuthService,
@@ -32,6 +34,7 @@ export class LoginComponent {
 
   submitData() {
     this.isLoading.set(true);
+    this.errorMessage.set('');
 
     const successCb = (value: LoginResponse) => {
       const response = value as LoginResponse;
@@ -49,10 +52,8 @@ export class LoginComponent {
 
     this.authService.doLogin(this.userLogin).subscribe({
       next: successCb,
-      error: (err) => {
-        if (err) {
-          console.error(err);
-        }
+      error: (err: HttpErrorResponse) => {
+        this.errorMessage.set(err.error?.message || err?.message);
       },
       complete: finallyCb,
     });

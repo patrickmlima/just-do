@@ -35,6 +35,11 @@
         />
       </div>
     </form>
+    @if(errorMessage()) {
+    <ngb-alert type="danger" (closed)="errorMessage.set('')">
+      {{ errorMessage() }}
+    </ngb-alert>
+    }
   </div>
   <div class="modal-footer">
     <button
