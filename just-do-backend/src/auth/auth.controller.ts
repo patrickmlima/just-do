@@ -1,9 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { UserAuthDto } from './dto/userAuth.dto';
@@ -16,12 +24,14 @@ export class AuthController {
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
   @Post('login')
-  async login(@Body() userLogin: UserAuthDto) {
+  async login(@Body() userLogin: UserAuthDto, @Res() response: Response) {
     const { username, password } = userLogin;
     const user = await this.authService.validateUser(username, password);
     if (user) {
       const tokenResponse = await this.authService.issueToken(user);
-      return tokenResponse;
+      return response.status(HttpStatus.OK).send(tokenResponse);
     }
+
+    throw new UnauthorizedException('User credentials are wrong');
   }
 }
