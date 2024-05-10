@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
+import { TasksListComponent } from '../tasks-list/tasks-list.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [TasksListComponent],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.sass'
+  styleUrl: './home.component.sass',
 })
-export class HomeComponent {
-
-}
+export class HomeComponent {}

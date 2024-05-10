@@ -1,0 +1,20 @@
+<section>
+  <table>
+    <thead>
+      <tr>
+        <td>Title</td>
+        <td>description</td>
+        <td>Is completed</td>
+        <td>Created at</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let task of tasksList">
+        <td>{{ task.title }}</td>
+        <td>{{ task.description }}</td>
+        <td>{{ task.isCompleted ? 'Done' : 'To do' }}</td>
+        <td>{{ task.createdAt }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
