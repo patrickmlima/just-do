@@ -1,0 +1,9 @@
+<button
+  class="btn btn-secondary"
+  ngbTooltip="Mark task as completed"
+  placement="top"
+  (click)="changeTaskCompletion()"
+  [disabled]="!isLoading"
+>
+  Complete
+</button>

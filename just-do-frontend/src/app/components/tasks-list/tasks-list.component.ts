@@ -12,11 +12,20 @@ import { SharedModule } from '../../shared/shared.module';
 import { DataResponse } from '../../shared/types/api.type';
 import { NewTaskComponent } from '../new-task/new-task.component';
 import { DeleteTaskComponent } from '../delete-task/delete-task.component';
+import { NgbTooltip } from '@ng-bootstrap/ng-bootstrap';
+import { TaskCompleteComponent } from '../task-complete/task-complete.component';
 
 @Component({
   selector: 'tasks-list',
   standalone: true,
-  imports: [CommonModule, SharedModule, NewTaskComponent, DeleteTaskComponent],
+  imports: [
+    CommonModule,
+    SharedModule,
+    NewTaskComponent,
+    DeleteTaskComponent,
+    TaskCompleteComponent,
+    NgbTooltip,
+  ],
   templateUrl: './tasks-list.component.html',
   styleUrl: './tasks-list.component.sass',
 })
