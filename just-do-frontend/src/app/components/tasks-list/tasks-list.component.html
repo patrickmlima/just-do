@@ -16,7 +16,11 @@
       <tr *ngFor="let task of tasksList">
         <td>{{ task.title }}</td>
         <td>{{ task.description }}</td>
-        <td>{{ task.isComplete ? 'Yes' : 'No' }}</td>
+        <td>
+          {{ task.isComplete ? 'Yes' : 'No' }}
+          <i class="bi bi-check2-square" *ngIf="task?.isComplete"></i>
+          <i class="bi bi-slash-square" *ngIf="!task?.isComplete"></i>
+        </td>
         <td>{{ task.createdAt }}</td>
         <td>
           <app-task-complete
