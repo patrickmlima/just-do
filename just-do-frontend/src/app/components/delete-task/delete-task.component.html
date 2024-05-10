@@ -1,0 +1,33 @@
+<button class="btn btn-danger" (click)="openModal(content)">Delete</button>
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Attention</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('close_btn')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete task "{{ task?.title }}"</p>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="submit"
+      class="btn btn-warning"
+      [disabled]="!isLoading"
+      (click)="negative()"
+    >
+      No
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="!isLoading"
+      (click)="positive()"
+    >
+      Yes
+    </button>
+  </div>
+</ng-template>

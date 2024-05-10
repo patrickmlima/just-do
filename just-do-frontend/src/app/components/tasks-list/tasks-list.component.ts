@@ -11,11 +11,12 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../shared/shared.module';
 import { DataResponse } from '../../shared/types/api.type';
 import { NewTaskComponent } from '../new-task/new-task.component';
+import { DeleteTaskComponent } from '../delete-task/delete-task.component';
 
 @Component({
   selector: 'tasks-list',
   standalone: true,
-  imports: [CommonModule, SharedModule, NewTaskComponent],
+  imports: [CommonModule, SharedModule, NewTaskComponent, DeleteTaskComponent],
   templateUrl: './tasks-list.component.html',
   styleUrl: './tasks-list.component.sass',
 })
@@ -23,20 +24,20 @@ export class TasksListComponent implements OnInit, OnDestroy {
   tasksList: Task[] = [];
   isLoading = signal(false);
 
-  newTaskCreated = new EventEmitter(false);
+  taskListChanges = new EventEmitter(false);
 
   constructor(private readonly userTaskService: UserTaskService) {}
 
   ngOnInit(): void {
     this.loadTasks();
 
-    this.newTaskCreated.subscribe(() => {
+    this.taskListChanges.subscribe(() => {
       this.loadTasks();
     });
   }
 
   ngOnDestroy(): void {
-    this.newTaskCreated.unsubscribe();
+    this.taskListChanges.unsubscribe();
   }
 
   private loadTasks() {

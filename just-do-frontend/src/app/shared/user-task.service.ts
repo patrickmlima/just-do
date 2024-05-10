@@ -33,10 +33,10 @@ export class UserTaskService {
   }
 
   patch(id: number, data: Partial<TaskPatchDto>) {
-    return this.httpClient.patch<Task>(`${this.httpClient}/${id}`, data);
+    return this.httpClient.patch<Task>(`${this.url}/${id}`, data);
   }
 
   delete(id: number) {
-    return this.httpClient.delete(`${this.httpClient}/${id}`);
+    return this.httpClient.delete(`${this.url}/${id}`);
   }
 }

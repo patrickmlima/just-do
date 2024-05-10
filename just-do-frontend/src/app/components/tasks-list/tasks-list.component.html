@@ -1,6 +1,6 @@
 <section>
   <div class="actions">
-    <app-new-task [newTaskEmitter]="newTaskCreated"></app-new-task>
+    <app-new-task [newTaskEmitter]="taskListChanges"></app-new-task>
   </div>
   <table class="table table-striped">
     <thead>
@@ -9,6 +9,7 @@
         <th scope="col">description</th>
         <th scope="col">Is completed</th>
         <th scope="col">Created at</th>
+        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -17,6 +18,12 @@
         <td>{{ task.description }}</td>
         <td>{{ task.isCompleted ? 'Yes' : 'No' }}</td>
         <td>{{ task.createdAt }}</td>
+        <td>
+          <app-delete-task
+            [taskDeleteEvents]="taskListChanges"
+            [task]="task"
+          ></app-delete-task>
+        </td>
       </tr>
     </tbody>
   </table>
