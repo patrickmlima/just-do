@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 
 import { PasswordService } from 'src/api/users/password/password.service';
 import { UsersService } from 'src/api/users/users.service';
 import { User } from 'src/database/entities/user.entity';
+import { AccessTokenPayload } from 'src/shared/types/auth.types';
 
 @Injectable()
 export class AuthService {
+  private accessTokenType = 'Bearer';
   constructor(
     private readonly userService: UsersService,
     private readonly passwordService: PasswordService,
@@ -41,5 +44,31 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload, { expiresIn: '1 day' }),
     };
+  }
+
+  isTokenValid(token: string | undefined) {
+    try {
+      this.jwtService.verify(token);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  getTokenPayload(token: string) {
+    return this.jwtService.decode<AccessTokenPayload>(token);
+  }
+
+  getTokenFromHeader(request: Request) {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === this.accessTokenType ? token : undefined;
+  }
+
+  getTokenPayloadFromHeader(request: Request): AccessTokenPayload | undefined {
+    const token = this.getTokenFromHeader(request);
+    if (token) {
+      return this.getTokenPayload(token);
+    }
+    return undefined;
   }
 }
