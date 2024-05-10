@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -23,6 +24,7 @@ import {
 import { Response } from 'express';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { User } from 'src/database/entities/user.entity';
 import { APIDataResponse } from 'src/shared/responses/api-data-response';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -33,6 +35,7 @@ import { UsersService } from './users.service';
 @ApiTags('Users')
 @ApiUnauthorizedResponse()
 @ApiBearerAuth('bearerAuth')
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

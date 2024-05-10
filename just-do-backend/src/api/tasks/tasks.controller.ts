@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -23,6 +24,7 @@ import {
 import { Response } from 'express';
 import { EntityNotFoundError } from 'typeorm';
 
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { Task } from 'src/database/entities/task.entity';
 import { APIDataResponse } from 'src/shared/responses/api-data-response';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -33,6 +35,7 @@ import { TasksService } from './tasks.service';
 @ApiTags('Tasks')
 @ApiUnauthorizedResponse()
 @ApiBearerAuth('bearerAuth')
+@UseGuards(JwtAuthGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
