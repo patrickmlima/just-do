@@ -16,15 +16,14 @@
       <tr *ngFor="let task of tasksList">
         <td>{{ task.title }}</td>
         <td>{{ task.description }}</td>
-        <td>{{ task.isCompleted ? 'Yes' : 'No' }}</td>
+        <td>{{ task.isComplete ? 'Yes' : 'No' }}</td>
         <td>{{ task.createdAt }}</td>
         <td>
-          @if (!task.isCompleted) {
           <app-task-complete
             [task]="task"
             [taskCompletionEvents]="taskListChanges"
           ></app-task-complete>
-          }
+
           <app-delete-task
             [taskDeleteEvents]="taskListChanges"
             [task]="task"

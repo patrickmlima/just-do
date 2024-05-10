@@ -1,9 +1,9 @@
 <button
   class="btn btn-secondary"
-  ngbTooltip="Mark task as completed"
+  [ngbTooltip]="getTooltipMessage()"
   placement="top"
   (click)="changeTaskCompletion()"
   [disabled]="!isLoading"
 >
-  Complete
+  {{ task?.isComplete ? 'Unfinished' : 'Complete' }}
 </button>

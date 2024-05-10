@@ -26,7 +26,7 @@ export class TaskCompleteComponent {
 
     this.taskService
       .patch(this.task!.id, {
-        isCompleted: !this.task!.isCompleted,
+        isComplete: !this.task!.isComplete,
       })
       .subscribe({
         next: () => {
@@ -37,5 +37,9 @@ export class TaskCompleteComponent {
         },
         complete: () => this.isLoading.set(false),
       });
+  }
+
+  getTooltipMessage() {
+    return `Mark task as ${this.task?.isComplete ? 'Unfinished' : 'Completed'}`;
   }
 }

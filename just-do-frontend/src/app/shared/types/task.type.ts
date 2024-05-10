@@ -4,7 +4,7 @@ export type Task = {
   id: number;
   title: string;
   description?: string;
-  isCompleted: boolean;
+  isComplete: boolean;
   createdAt: Date;
   updatedAt: Date;
   owner: Partial<User>;
@@ -23,11 +23,11 @@ export class TaskCreateDto {
 export class TaskPatchDto {
   title?: string;
   description?: String;
-  isCompleted?: boolean;
+  isComplete?: boolean;
 
   constructor(title?: string, isCompleted?: boolean, description?: string) {
     this.title = title;
     this.description = description;
-    this.isCompleted = isCompleted;
+    this.isComplete = isCompleted;
   }
 }
