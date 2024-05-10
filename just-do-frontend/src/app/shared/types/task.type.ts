@@ -12,31 +12,22 @@ export type Task = {
 
 export class TaskCreateDto {
   title: string;
-  description?: String;
-  ownerId: number;
+  description?: string | null;
 
-  constructor(title: string, ownerId: number, description?: string) {
+  constructor(title: string = '', description?: string | null) {
     this.title = title;
     this.description = description;
-    this.ownerId = ownerId;
   }
 }
 
 export class TaskPatchDto {
   title?: string;
   description?: String;
-  ownerId?: number;
   isCompleted?: boolean;
 
-  constructor(
-    title: string,
-    ownerId: number,
-    isCompleted: boolean,
-    description?: string,
-  ) {
+  constructor(title?: string, isCompleted?: boolean, description?: string) {
     this.title = title;
     this.description = description;
-    this.ownerId = ownerId;
     this.isCompleted = isCompleted;
   }
 }

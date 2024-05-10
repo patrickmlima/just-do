@@ -1,6 +1,6 @@
 <section>
   <div class="actions">
-    <button type="button" class="btn btn-primary">New Task</button>
+    <app-new-task [newTaskEmitter]="newTaskCreated"></app-new-task>
   </div>
   <table class="table table-striped">
     <thead>
@@ -15,7 +15,7 @@
       <tr *ngFor="let task of tasksList">
         <td>{{ task.title }}</td>
         <td>{{ task.description }}</td>
-        <td>{{ task.isCompleted ? 'Done' : 'To do' }}</td>
+        <td>{{ task.isCompleted ? 'Yes' : 'No' }}</td>
         <td>{{ task.createdAt }}</td>
       </tr>
     </tbody>

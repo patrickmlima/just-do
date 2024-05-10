@@ -1,0 +1,48 @@
+<button class="btn btn-lg btn-primary" (click)="openModal(content)">
+  New Task
+</button>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Let's create your task</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('close_btn')"
+    ></button>
+  </div>
+  <form [formGroup]="taskForm" (ngSubmit)="submitData()">
+    <div class="modal-body">
+      <div class="mb-4">
+        <label for="name">Task nme</label>
+        <input
+          id="task-name"
+          name="name"
+          class="form-control"
+          type="text"
+          formControlName="title"
+        />
+      </div>
+      <div class="mb-4">
+        <label for="description">Description</label>
+        <textarea
+          id="task-description"
+          name="description"
+          class="form-control"
+          maxlength="1024"
+          formControlName="description"
+        ></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="submit"
+        class="btn btn-dark"
+        [disabled]="!isLoading || taskForm.invalid"
+      >
+        Create
+      </button>
+    </div>
+  </form>
+</ng-template>
