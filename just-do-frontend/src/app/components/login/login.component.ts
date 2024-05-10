@@ -1,9 +1,10 @@
 import { Component, inject, signal, TemplateRef } from '@angular/core';
-import { UserLogin } from '../shared/types/user.type';
+import { UserLogin } from '../../shared/types/user.type';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AuthService } from '../auth/auth.service';
-import { LoginResponse } from '../shared/types/auth.type';
+import { AuthService } from '../../auth/auth.service';
+import { LoginResponse } from '../../shared/types/auth.type';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'login',
@@ -17,14 +18,16 @@ export class LoginComponent {
   userLogin: UserLogin = { username: '', password: '' };
   isLoading = signal(false);
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly router: Router,
+  ) {}
 
   openLoginModal(content: TemplateRef<any>) {
     this.modalService
       .open(content, { ariaLabelledBy: 'modal-basic-title' })
       .result.then((result) => {
-        console.log(`Closed with: ${result}`);
-        console.log('data ', this.userLogin);
+        this.userLogin = { username: '', password: '' };
       });
   }
 
@@ -34,7 +37,9 @@ export class LoginComponent {
     const successCb = (value: LoginResponse) => {
       const response = value as LoginResponse;
       if (response.access_token) {
-        console.log('token ', response.access_token);
+        this.authService.setSession(response.access_token);
+        this.modalService.dismissAll();
+        this.router.navigate(['home']);
       }
     };
 

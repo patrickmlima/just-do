@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserLogin } from '../shared/types/user.type';
-import { environment } from '../../environments/environment';
-import { LoginResponse } from '../shared/types/auth.type';
 import { Observable } from 'rxjs';
+
+import { environment } from '../../../environments/environment';
+import { LoginResponse } from '../../shared/types/auth.type';
+import { UserLogin } from '../../shared/types/user.type';
 
 const { authServer } = environment;
 
