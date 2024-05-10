@@ -77,6 +77,7 @@ export class TasksController {
 
       const [list] = await this.tasksService.findAll({
         where: { owner: { id: ownerId } },
+        order: { createdAt: 'DESC', title: 'ASC' },
       });
       return new APIDataResponse<Task[]>(list);
     } catch (err: any) {
