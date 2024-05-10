@@ -17,6 +17,8 @@ export class AuthService {
     `${authServer.port}/${authServer.uri}`;
 
   private ACCESS_TOKEN_KEY = 'access_tk';
+  accessTokenType = `Bearer`;
+
   constructor(private httpClient: HttpClient) {}
 
   doLogin(credentials: UserLogin): Observable<LoginResponse> {
@@ -32,11 +34,11 @@ export class AuthService {
     }
   }
 
-  getToken() {
+  getAccessToken() {
     return localStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 
   isAuthenticated() {
-    return !!localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    return !!this.getAccessToken();
   }
 }
