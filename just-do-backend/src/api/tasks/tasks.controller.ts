@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -21,9 +22,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { EntityNotFoundError } from 'typeorm';
 
+import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 import { Task } from 'src/database/entities/task.entity';
 import { APIDataResponse } from 'src/shared/responses/api-data-response';
@@ -37,18 +39,24 @@ import { TasksService } from './tasks.service';
 @ApiBearerAuth('bearerAuth')
 @UseGuards(JwtAuthGuard)
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(
+    private readonly tasksService: TasksService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post()
   @ApiCreatedResponse()
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
   async create(
+    @Req() request: Request,
     @Body() createTaskDto: CreateTaskDto,
     @Res() response: Response,
   ) {
     try {
-      const task = await this.tasksService.create(createTaskDto);
+      const payload = this.authService.getTokenPayloadFromHeader(request);
+      const ownerId = parseInt(payload?.sub, 10);
+      const task = await this.tasksService.create(createTaskDto, ownerId);
       response.status(HttpStatus.CREATED).send(new APIDataResponse<Task>(task));
     } catch (err) {
       throw new HttpException(
@@ -62,9 +70,14 @@ export class TasksController {
   @ApiOkResponse()
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
-  async findAll() {
+  async findAll(@Req() request: Request) {
     try {
-      const [list] = await this.tasksService.findAll();
+      const payload = this.authService.getTokenPayloadFromHeader(request);
+      const ownerId = parseInt(payload?.sub, 10);
+
+      const [list] = await this.tasksService.findAll({
+        where: { owner: { id: ownerId } },
+      });
       return new APIDataResponse<Task[]>(list);
     } catch (err: any) {
       throw new HttpException(err?.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -76,9 +89,12 @@ export class TasksController {
   @ApiBadRequestResponse()
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
-  async findOne(@Param('id') id: string) {
+  async findOne(@Req() request: Request, @Param('id') id: number) {
     try {
-      const task = await this.tasksService.findOne(+id);
+      const payload = this.authService.getTokenPayloadFromHeader(request);
+      const ownerId = parseInt(payload?.sub, 10);
+
+      const task = await this.tasksService.findOne(id, ownerId);
       return task;
     } catch (err) {
       let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -96,9 +112,20 @@ export class TasksController {
   @ApiBadRequestResponse()
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
-  async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+  async update(
+    @Req() request: Request,
+    @Param('id') id: number,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ) {
     try {
-      const updatedTask = await this.tasksService.update(+id, updateTaskDto);
+      const payload = this.authService.getTokenPayloadFromHeader(request);
+      const ownerId = parseInt(payload?.sub, 10);
+
+      const updatedTask = await this.tasksService.update(
+        id,
+        updateTaskDto,
+        ownerId,
+      );
       return updatedTask;
     } catch (err) {
       let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -116,9 +143,12 @@ export class TasksController {
   @ApiBadRequestResponse()
   @ApiNotFoundResponse()
   @ApiInternalServerErrorResponse()
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') id: number, @Req() request: Request) {
     try {
-      await this.tasksService.remove(+id);
+      const payload = this.authService.getTokenPayloadFromHeader(request);
+      const ownerId = parseInt(payload?.sub, 10);
+
+      await this.tasksService.remove(id, ownerId);
     } catch (err) {
       let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
 

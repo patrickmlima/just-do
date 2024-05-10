@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
 import { APP_CONSTANTS } from 'src/shared/constants';
 
@@ -30,9 +24,4 @@ export class CreateTaskDto {
     maxLength: inputsLengthRange.taskDescription.max,
   })
   description: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  @ApiProperty({ required: true, minimum: 1 })
-  owner: number;
 }

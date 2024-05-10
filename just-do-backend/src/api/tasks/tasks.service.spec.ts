@@ -11,12 +11,19 @@ import { mockedTasksList } from '../../../test/mocks/tasks.mock';
 import { Task } from '../../database/entities/task.entity';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TasksService } from './tasks.service';
+import { User } from 'src/database/entities/user.entity';
 
 const findOneOrFailImplementation = async (
   where: FindOptionsWhere<Task> | FindOptionsWhere<Task>[],
 ) => {
-  const { id } = (where ?? {}) as FindOptionsWhere<Task>;
-  const foundItem = mockedTasksList.find((item) => item.id === id);
+  const whereCasted = (where ?? {}) as FindOptionsWhere<Task>;
+
+  const { id } = whereCasted;
+  const owner: Partial<User> = whereCasted?.owner as User;
+
+  const foundItem = mockedTasksList.find(
+    (item) => item.id === id && item.owner.id === owner?.id,
+  );
   return new Promise<Task>((resolve, reject) =>
     foundItem
       ? resolve(foundItem)
@@ -25,8 +32,11 @@ const findOneOrFailImplementation = async (
 };
 
 const updateOneImplementation = (criteria: any) => {
-  const { id } = criteria;
-  const foundItem = mockedTasksList.find((item) => item.id === id);
+  const { id, owner } = criteria;
+
+  const foundItem = mockedTasksList.find(
+    (item) => item.id === id && item.owner.id === owner.id,
+  );
   return new Promise<UpdateResult>((resolve) => {
     return resolve({
       affected: foundItem ? 1 : 0,
@@ -72,15 +82,18 @@ describe('TasksService', () => {
   });
 
   it('should be able to get a single task', async () => {
-    const [expectedUser] = mockedTasksList;
+    const [expectedTask] = mockedTasksList;
     const findOneSpy = jest
       .spyOn(repository, 'findOneByOrFail')
       .mockImplementation(findOneOrFailImplementation);
 
-    const actualUser = await service.findOne(expectedUser.id);
+    const actualUser = await service.findOne(
+      expectedTask.id,
+      expectedTask.owner.id,
+    );
 
     expect(findOneSpy).toHaveBeenCalled();
-    expect(actualUser).toBe(expectedUser);
+    expect(actualUser).toBe(expectedTask);
   });
 
   it('should throw exception when task is not found', async () => {
@@ -88,8 +101,11 @@ describe('TasksService', () => {
       .spyOn(repository, 'findOneByOrFail')
       .mockImplementation(findOneOrFailImplementation);
 
+    const nonExistentTaskId = 111;
+    const someUserId = 111;
+
     try {
-      await service.findOne(111);
+      await service.findOne(nonExistentTaskId, someUserId);
       expect(findOneSpy).toThrow(EntityNotFoundError);
     } catch (err) {
       // just to show error on console
@@ -115,7 +131,11 @@ describe('TasksService', () => {
         return Promise.resolve(selected);
       });
 
-    const actualUser = await service.update(theTask.id, patchData);
+    const actualUser = await service.update(
+      theTask.id,
+      patchData,
+      theTask.owner.id,
+    );
 
     expect(updateSpy).toHaveBeenCalled();
     expect(findAfterUpdateSpy).toHaveBeenCalled();
@@ -129,8 +149,11 @@ describe('TasksService', () => {
       .spyOn(repository, 'update')
       .mockImplementation(updateOneImplementation);
 
+    const nonExistentTaskId = 123;
+    const someUserId = 111;
+
     try {
-      await service.update(123, patchData);
+      await service.update(nonExistentTaskId, patchData, someUserId);
     } catch (err) {
       expect(err).toBeInstanceOf(EntityNotFoundError);
     }
@@ -139,6 +162,7 @@ describe('TasksService', () => {
   });
 
   it('should be able to delete a task', async () => {
+    const [theTask] = mockedTasksList;
     const deleteSpy = jest.spyOn(repository, 'delete').mockImplementation(() =>
       Promise.resolve({
         affected: 1,
@@ -148,7 +172,7 @@ describe('TasksService', () => {
     );
 
     try {
-      await service.remove(1);
+      await service.remove(theTask.id, theTask.owner.id);
     } catch (err) {
       // nothing to do
     }
@@ -165,8 +189,11 @@ describe('TasksService', () => {
       } as UpdateResult),
     );
 
+    const nonExistentTaskId = 111;
+    const someUserId = 111;
+
     try {
-      await service.remove(111);
+      await service.remove(nonExistentTaskId, someUserId);
     } catch (err) {
       expect(err).toBeInstanceOf(EntityNotFoundError);
     }

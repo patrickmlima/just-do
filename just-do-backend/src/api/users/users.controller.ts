@@ -30,11 +30,11 @@ import { APIDataResponse } from 'src/shared/responses/api-data-response';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
+import { Public } from 'src/shared/decorators/public-request.decorator';
 
 @Controller('users')
 @ApiTags('Users')
 @ApiUnauthorizedResponse()
-@ApiBearerAuth('bearerAuth')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -43,6 +43,7 @@ export class UsersController {
   @ApiCreatedResponse()
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
+  @Public()
   async create(
     @Body() createUserDto: CreateUserDto,
     @Res() response: Response,
@@ -78,6 +79,7 @@ export class UsersController {
   @Get(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse()
+  @ApiBearerAuth('bearerAuth')
   async findOne(@Param('id') id: string) {
     try {
       const user = await this.usersService.findOne(+id);
@@ -98,6 +100,7 @@ export class UsersController {
   @ApiOkResponse()
   @ApiNotFoundResponse()
   @ApiBadRequestResponse()
+  @ApiBearerAuth('bearerAuth')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     try {
       const user = await this.usersService.update(+id, updateUserDto);
@@ -123,6 +126,7 @@ export class UsersController {
   @Delete(':id')
   @ApiOkResponse()
   @ApiNotFoundResponse()
+  @ApiBearerAuth('bearerAuth')
   async remove(@Param('id') id: string) {
     try {
       await this.usersService.remove(+id);
