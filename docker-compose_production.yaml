@@ -10,9 +10,9 @@ services:
       - '3000:3000'
     networks:
       - db_network
+      - fe_network
     depends_on:
       - database
-      - fe_network
     volumes:
       - ./src:/app/src
 
