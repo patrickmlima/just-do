@@ -14,14 +14,16 @@ import { SharedModule } from './shared/shared.module';
 
 const nodeEnv = process.env.NODE_ENV;
 
+const envFilePath = path.resolve(
+  'environments',
+  `.env${nodeEnv ? `.${nodeEnv}` : ''}`,
+);
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: path.resolve(
-        'environments',
-        `.env.${nodeEnv ?? 'development'}`,
-      ),
+      envFilePath,
       load: [appConfig, dbConfig, authConfig],
     }),
     DatabaseModule,
