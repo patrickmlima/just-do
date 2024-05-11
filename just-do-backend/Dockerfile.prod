@@ -1,0 +1,24 @@
+FROM node:20-alpine AS build
+
+WORKDIR /app
+COPY package*.json ./
+
+RUN npm install
+COPY . .
+
+RUN npm run build
+
+
+FROM node:20-alpine AS production
+ENV NODE_ENV=production
+
+RUN mkdir -p /app/dist/environments
+WORKDIR /app
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/dist ./
+COPY --from=build /app/environments/.env.production ./environments/.env.production
+
+RUN npm install --omit=dev
+EXPOSE 3000
+
+CMD ["node", "main"]
